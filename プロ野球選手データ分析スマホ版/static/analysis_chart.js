@@ -19,7 +19,10 @@ const barColors = [
 
 const isSingleItem = selectedItems.length === 1;
 
-new Chart(ctx, {
+Chart.defaults.font.size = 16;
+Chart.defaults.font.family = "'Meiryo', 'Yu Gothic', sans-serif";
+
+const chart = new Chart(ctx, {
   type: isSingleItem ? 'line' : 'bar',
 
   data: {
@@ -72,12 +75,17 @@ new Chart(ctx, {
     responsive: true,
     maintainAspectRatio: false,
 
+     interaction: {
+    mode: 'index',      // 同じ年のデータをまとめて表示
+    intersect: false    // 点にぴったり合わせなくても反応する
+  },
     scales: {
       x: {
         grid: { display: false },
         ticks: {
           align: 'center',
-          color: '#666666'
+          color: '#666666',
+          font: {size :18 }
         },
         offset: true
       },
@@ -94,10 +102,20 @@ new Chart(ctx, {
         title: {
           display: true,
           text: itemLeft,
-          color: '#333333',
+          color: '#6B7A99',
           font: { weight: 'bold' }
-        }
-      },
+        },
+        ticks: {
+          color: '#6B7A99',
+          font:{ size: 16 }
+        },
+        title: {
+      display: true,
+      text: itemLeft,
+      color: '#6B7A99',
+      font: { size: 18, weight: 'bold' }   
+      }
+    },
 
       y1: {
         type: 'linear',
@@ -109,9 +127,10 @@ new Chart(ctx, {
         title: {
           display: true,
           text: itemRight,
-          color: '#333333',
-          font: { weight: 'bold' }
-        }
+          color: lineColors[0],
+          font: { size: 14, weight: 'bold' }
+        },
+        ticks: { color: lineColors[0] }
       }
     },
 
@@ -119,12 +138,12 @@ new Chart(ctx, {
       legend: {
         position: 'top',
         labels: {
-          boxWidth: 15,
-          font: { size: 12 }
+          boxWidth: 20,
+          font: { size: 16 }
         }
       },
 
-      tooltip: {
+            tooltip: {
         callbacks: {
           label: function(context) {
             const dataset = context.dataset;
@@ -151,7 +170,45 @@ new Chart(ctx, {
             return label;
           }
         }
+      },
+
+      // ここからズーム設定
+      zoom: {
+        pan: {
+          enabled: true,
+          mode: 'xy'
+        },
+        zoom: {
+          mode: 'xy',
+          pinch: {
+            enabled: true
+          },
+          wheel: {
+            enabled: false
+          },
+          drag: {
+            enabled: false
+          }
+        },
+        limits: {
+          x: { minRange: 1 },
+          y: { minRange: 1 },
+          y1: { minRange: 1 }
+        }
       }
     }
-  }
+}  
+      })
+      document.getElementById('zoomIn').addEventListener('click', () => {
+  chart.zoom(1.2);
 });
+
+document.getElementById('zoomOut').addEventListener('click', () => {
+  chart.zoom(0.8);
+});
+
+document.getElementById('zoomReset').addEventListener('click', () => {
+  chart.resetZoom();
+});
+      
+
